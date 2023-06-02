@@ -1,13 +1,10 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+  <div>Log.vue</div>
 </template>
 
 <script>
-// 导入
 export default {
-  name: 'APP'
+  name: 'my-login'
 }
 </script>
 

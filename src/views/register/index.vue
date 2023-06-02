@@ -1,13 +1,10 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
-  </div>
+  <div>Reg.vue</div>
 </template>
 
 <script>
-// 导入
 export default {
-  name: 'APP'
+  name: 'my-register'
 }
 </script>
 
