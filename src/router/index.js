@@ -5,6 +5,13 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/',
+    // webpack提供的import函数来路由懒加载导入组件
+    // 切换到了/reg才会加载代码
+    // 让首页体积更小，加载速度更快
+    redirect: '/login'
+  },
+  {
     path: '/reg',
     // webpack提供的import函数来路由懒加载导入组件
     // 切换到了/reg才会加载代码
@@ -13,8 +20,11 @@ const routes = [
   },
   {
     path: '/login',
-
     component: () => import('@/views/login')
+  },
+  {
+    path: '/layout',
+    component: () => import('@/views/layout')
   }
 ]
 
