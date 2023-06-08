@@ -1,64 +1,81 @@
 <!-- 主页面 -->
 <template>
   <el-container class="main">
-    <!-- header -->
+    <!-- 导航栏 -->
     <el-header class="header_box">
       <el-menu :default-active="activeIndex2" class="el-menu-demo header" mode="horizontal" @select="handleSelect"
         background-color="#23272f" text-color="#fff" active-text-color="#ffd04b">
         <img src="@/assets/images/logo.png" alt="">
-        <div class="direction">
+        <div class="nav">
           <el-submenu index="1" class="individual">
             <template slot="title">
               <div class="individual_box">
-                <span class="avatar"></span>
+                <img class="avatar" :src="suer_pic" v-if="suer_pic">
+                <img class="avatar" src="@/assets/images/img.png" v-else>
                 个人中心
               </div>
             </template>
-            <el-menu-item index="1-1">选项1</el-menu-item>
-            <el-menu-item index="1-2">选项2</el-menu-item>
-            <el-menu-item index="1-3">选项3</el-menu-item>
+            <el-menu-item index="1-1"><i class="el-icon-s-operation"></i>基本资料</el-menu-item>
+            <el-menu-item index="1-2"><i class="el-icon-camera"></i>更换头像</el-menu-item>
+            <el-menu-item index="1-3"><i class="el-icon-key"></i>重置密码</el-menu-item>
           </el-submenu>
-          <el-menu-item index="2"><i class="el-icon-switch-button"></i>退出</el-menu-item>
+          <el-menu-item index="2" @click.native="quitFn"><i class="el-icon-switch-button"></i>退出</el-menu-item>
         </div>
       </el-menu>
     </el-header>
+    <!-- 侧边栏 -->
     <el-container>
-      <el-aside width="200px">
+      <el-aside width="200px" class="aside">
         <el-row class="tac">
           <el-col>
-            <h5>自定义颜色</h5>
-            <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
-              background-color="#23272f" text-color="#fff" active-text-color="#5d84c4 ">
-              <el-submenu index="1">
+            <!-- 用户信息 -->
+            <h5 class="user">
+              <img class="avatar" :src="suer_pic" v-if="suer_pic">
+              <img class="avatar" src="@/assets/images/img.png" v-else>
+              <span>欢迎 {{ nickname || username }}</span>
+            </h5>
+            <!-- 导航栏 -->
+            <el-menu default-active="/home" class="el-menu-vertical-demo container" unique-opened @open="handleOpen"
+              @close="handleClose" background-color="#23272f" text-color="#fff" active-text-color="#3a99ff ">
+              <!-- 首页 -->
+              <el-menu-item index="/home">
+                <i class="el-icon-s-home"></i>
+                <span>首页</span>
+              </el-menu-item>
+              <!-- 文章管理 -->
+              <el-submenu index="/topic">
                 <template slot="title">
-                  <i class="el-icon-location"></i>
-                  <span>导航一</span>
+                  <i class="el-icon-s-order"></i>
+                  <span>文章管理</span>
                 </template>
-                <el-menu-item-group>
-                  <template slot="title">分组一</template>
-                  <el-menu-item index="1-1">选项1</el-menu-item>
-                  <el-menu-item index="1-2">选项2</el-menu-item>
-                </el-menu-item-group>
-                <el-menu-item-group title="分组2">
-                  <el-menu-item index="1-3">选项3</el-menu-item>
-                </el-menu-item-group>
-                <el-submenu index="1-4">
-                  <template slot="title">选项4</template>
-                  <el-menu-item index="1-4-1">选项1</el-menu-item>
-                </el-submenu>
+                <el-menu-item index="/topic1">
+                  <i class="el-icon-s-data"></i>
+                  <span slot="title">文章分类</span>
+                </el-menu-item>
+                <el-menu-item index="/topic2">
+                  <i class="el-icon-document-copy"></i>
+                  <span slot="title">文章列表</span>
+                </el-menu-item>
               </el-submenu>
-              <el-menu-item index="2">
-                <i class="el-icon-menu"></i>
-                <span slot="title">导航二</span>
-              </el-menu-item>
-              <el-menu-item index="3" disabled>
-                <i class="el-icon-document"></i>
-                <span slot="title">导航三</span>
-              </el-menu-item>
-              <el-menu-item index="4">
-                <i class="el-icon-setting"></i>
-                <span slot="title">导航四</span>
-              </el-menu-item>
+              <!-- 个人中心 -->
+              <el-submenu index="/my">
+                <template slot="title">
+                  <i class="el-icon-user-solid"></i>
+                  <span>个人中心</span>
+                </template>
+                <el-menu-item index="3-1">
+                  <i class="el-icon-s-operation"></i>
+                  <span slot="title">基本资料</span>
+                </el-menu-item>
+                <el-menu-item index="3-2">
+                  <i class="el-icon-camera-solid"></i>
+                  <span slot="title">更换头像</span>
+                </el-menu-item>
+                <el-menu-item index="3-3">
+                  <i class="el-icon-key"></i>
+                  <span slot="title">重置密码</span>
+                </el-menu-item>
+              </el-submenu>
             </el-menu>
           </el-col>
         </el-row>
@@ -72,15 +89,47 @@
 </template>
 
 <script>
+import store from '@/store'
+import { mapGetters } from 'vuex'
+import { sidebar } from '@/api/channel'
 export default {
   name: 'main_layout',
   data () {
     return {
       activeIndex: '1',
-      activeIndex2: '1'
+      activeIndex2: '1',
+      menus: []
     }
   },
+  computed: {
+    // vuex用户数据
+    ...mapGetters(['nickname', 'username', 'suer_pic'])
+  },
+  created () {
+    this.getMenusListFn()
+  },
   methods: {
+    // 退出
+    quitFn () {
+      this.$confirm('确认退出吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$store.commit('updateToken', '')
+        this.$store.commit('updateUserInfo', {})
+        this.$message({
+          type: 'success',
+          message: '退出成功!'
+        })
+        this.$router.push('/login')
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消退出'
+        })
+      })
+    },
     handleOpen (key, keyPath) {
       console.log(key, keyPath)
     },
@@ -89,7 +138,17 @@ export default {
     },
     handleSelect (key, keyPath) {
       console.log(key, keyPath)
+    },
+    // 获取侧边栏
+    async getMenusListFn () {
+      const { data: res } = await sidebar()
+      this.menus = res
+      console.log('@@' + res)
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    store.dispatch('initUserInfo')
+    next()
   }
 }
 </script>
@@ -100,11 +159,17 @@ export default {
   height: 100%;
 }
 
+//快捷导航
 .header_box {
   padding: 0;
+  border: 0;
+
+  .header {
+    border: 0;
+  }
 }
 
-.direction {
+.nav {
   float: right;
   display: flex;
   justify-content: right;
@@ -119,11 +184,40 @@ export default {
   }
 }
 
+// 个人中心头像
 .avatar {
   display: inline-block;
   width: 40px;
   height: 40px;
   background-color: #fff;
   border-radius: 50%;
+}
+
+// 侧边栏
+.aside {
+  height: 100%;
+  background-color: #23272f;
+}
+
+// 侧边栏用户信息
+.user {
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  height: 70px;
+  background-color: #23272f;
+  border: 1px solid #000;
+  border-width: 1px 0;
+
+  span {
+    margin-left: 10px;
+    color: #fff;
+  }
+}
+
+// 侧边导航
+.container {
+  height: 100%;
+  border: 0;
 }
 </style>
