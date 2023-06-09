@@ -51,14 +51,15 @@ export const getUserInfo = (token) => {
 }
 
 /**
- * 获取侧边栏
- * @param {*} token
- * @returns
+ * 侧边栏
+ * @returns {}
  */
-export const sidebar = () => {
-  request({
+export const getMenusAPI = () => {
+  return request({
     url: '/my/menus',
     method: 'GET',
-    headers: store.state.token
+    headers: {
+      Authorization: store.state.token
+    }
   })
 }

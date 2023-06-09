@@ -36,52 +36,32 @@
             </h5>
             <!-- 导航栏 -->
             <el-menu default-active="/home" class="el-menu-vertical-demo container" unique-opened @open="handleOpen"
-              @close="handleClose" background-color="#23272f" text-color="#fff" active-text-color="#3a99ff ">
+              @close="handleClose" background-color="#23272f" text-color="#fff" active-text-color="#3a99ff " router>
               <!-- 首页 -->
-              <el-menu-item index="/home">
-                <i class="el-icon-s-home"></i>
-                <span>首页</span>
-              </el-menu-item>
-              <!-- 文章管理 -->
-              <el-submenu index="/topic">
-                <template slot="title">
-                  <i class="el-icon-s-order"></i>
-                  <span>文章管理</span>
-                </template>
-                <el-menu-item index="/topic1">
-                  <i class="el-icon-s-data"></i>
-                  <span slot="title">文章分类</span>
+              <template v-for="item in menus">
+                <el-menu-item :index="item.indexPath" v-if="!item.children" :key="item.indexPath">
+                  <i :class="item.icon"></i>
+                  <span>{{ item.title }}</span>
                 </el-menu-item>
-                <el-menu-item index="/topic2">
-                  <i class="el-icon-document-copy"></i>
-                  <span slot="title">文章列表</span>
-                </el-menu-item>
-              </el-submenu>
-              <!-- 个人中心 -->
-              <el-submenu index="/my">
-                <template slot="title">
-                  <i class="el-icon-user-solid"></i>
-                  <span>个人中心</span>
-                </template>
-                <el-menu-item index="3-1">
-                  <i class="el-icon-s-operation"></i>
-                  <span slot="title">基本资料</span>
-                </el-menu-item>
-                <el-menu-item index="3-2">
-                  <i class="el-icon-camera-solid"></i>
-                  <span slot="title">更换头像</span>
-                </el-menu-item>
-                <el-menu-item index="3-3">
-                  <i class="el-icon-key"></i>
-                  <span slot="title">重置密码</span>
-                </el-menu-item>
-              </el-submenu>
+                <el-submenu :index="item.indexPath" v-else :key="item.indexPath">
+                  <template slot="title">
+                    <i :class="item.icon"></i>
+                    <span>{{ item.title }}</span>
+                  </template>
+                  <el-menu-item v-for="i in item.children" :key="i.indexPath" :index="i.indexPath">
+                    <i :class="i.icon"></i>
+                    <span slot="title">{{ i.title }}</span>
+                  </el-menu-item>
+                </el-submenu>
+              </template>
             </el-menu>
           </el-col>
         </el-row>
       </el-aside>
       <el-container>
-        <el-main>Main</el-main>
+        <el-main>
+          <router-link></router-link>
+        </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
     </el-container>
@@ -91,7 +71,7 @@
 <script>
 import store from '@/store'
 import { mapGetters } from 'vuex'
-import { sidebar } from '@/api/channel'
+import { getMenusAPI } from '@/api/channel'
 export default {
   name: 'main_layout',
   data () {
@@ -141,11 +121,11 @@ export default {
     },
     // 获取侧边栏
     async getMenusListFn () {
-      const { data: res } = await sidebar()
-      this.menus = res
-      console.log('@@' + res)
+      const { data: res } = await getMenusAPI()
+      this.menus = res.data
     }
   },
+
   beforeRouteEnter (to, from, next) {
     store.dispatch('initUserInfo')
     next()

@@ -9,12 +9,14 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     token: '',
-    userInfo: ''
+    userInfo: '',
+    menus: []
   },
   getters: {
-    nickname: state => state.userInfo.nickname,
-    username: state => state.userInfo.username,
-    suer_pic: state => state.userInfo.suer_pic
+    // 用户信息
+    nickname: state => state.userInfo.nickname, // 昵称
+    username: state => state.userInfo.username, // 用户名
+    suer_pic: state => state.userInfo.suer_pic // 头像
   },
   mutations: {
     // 保存token
@@ -26,6 +28,7 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    // 获取用户信息
     async initUserInfo (context) {
       const { data: res } = await getUserInfo()
       if (res.code === 0) {
