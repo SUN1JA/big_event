@@ -1,6 +1,5 @@
 // 接口
 import request from '@/utils/request'
-import store from '@/store'
 
 /**
  * register注册
@@ -43,10 +42,7 @@ export const loginAPI = ({ username, password }) => {
 export const getUserInfo = (token) => {
   return request({
     url: '/my/userinfo',
-    method: 'GET',
-    headers: {
-      Authorization: store.state.token
-    }
+    method: 'GET'
   })
 }
 
@@ -57,9 +53,6 @@ export const getUserInfo = (token) => {
 export const getMenusAPI = () => {
   return request({
     url: '/my/menus',
-    method: 'GET',
-    headers: {
-      Authorization: store.state.token
-    }
+    method: 'GET'
   })
 }
